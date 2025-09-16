@@ -1,17 +1,19 @@
 import numpy as np
 from flask import Flask, request, jsonify, render_template
-import joblib
+import pickle
+import joblib as joblib
+from joblib import load, dump 
 
 app = Flask(__name__)
 model = joblib.load(open('model.pkl', 'rb'))
+#model = joblib.load("E:\\Statistics\\Model_Deployment\\New\\Insur_charges_prd\\model.pkl")
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# ✅ For HTML Form Submissions
-@app.route('/predict', methods=['POST'])
-def predict_form():
+@app.route('/predict',methods=['POST'])
+def predict():
     '''
     For rendering results on HTML GUI
     '''
@@ -20,22 +22,17 @@ def predict_form():
     prediction = model.predict(final_features)
 
     output = round(prediction[0], 2)
-    return render_template('index.html', prediction_text=f'Insurance Charges {output}')
 
-# ✅ For API (JSON Input)
-@app.route('/predict_api', methods=['POST'])
-def predict_api():
-    '''
-    For direct API calls (JSON input)
-    '''
-    try:
-        data = request.get_json(force=True)
-        features = np.array(data['input']).reshape(1, -1)  # Expect: {"input": [age, bmi, children, ...]}
-        prediction = model.predict(features)
-        output = round(prediction[0], 2)
-        return jsonify({'prediction': output})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+    return render_template('index.html', prediction_text='Insurance Charges {}'.format(output))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    #app.run(debug = True)
+    app.run(host = '0.0.0.0', port = 5000, debug=True)
+#app.run(port = 4995)
+    
+    
+    
+    
+    
+
+    
